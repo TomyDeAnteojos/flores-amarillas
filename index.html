@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>¡Feliz día! — Flores amarillas</title>
+  <author>Tomás Medel</author>
+  <style>
+    :root{
+      --bg-1:#fffde7; /* marfil muy claro */
+      --bg-2:#fff59d; /* amarillo suave */
+      --bg-3:#ffecb3; /* dorado pastel */
+      --flower-yellow:#ffeb3b; /* pétalos */
+      --flower-yellow-2:#fdd835;
+      --flower-yellow-3:#fbc02d;
+      --flower-core-1:#ffca28; /* centro */
+      --flower-core-2:#f57f17;
+      --ink:#2b2b2b;
+    }
+
+    /* Fondo con luz cálida y destellos suaves */
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      background:
+        radial-gradient(65vmax 65vmax at 10% 5%, rgba(255,249,196,.7) 0 40%, transparent 70%),
+        radial-gradient(55vmax 55vmax at 85% 0%, rgba(255,236,179,.65) 0 42%, transparent 70%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 45%, var(--bg-3) 100%);
+      color:var(--ink);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      overflow:hidden;
+    }
+
+    .screen{
+      position:relative;
+      inline-size:100vw;
+      block-size:100svh; /* respeta barras móviles */
+      overflow:hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Mensaje principal */
+    .greeting{
+      position:absolute;
+      inset: 2rem 0 auto 0;
+      text-align:center;
+      font-weight:800;
+      letter-spacing:.02em;
+      line-height:1.1;
+      font-size:clamp(2rem, 6vw + .5rem, 4.5rem);
+      text-shadow:
+        0 2px 0 rgba(255,255,255,.85),
+        0 10px 25px rgba(0,0,0,.15);
+      user-select:none;
+      pointer-events:none;
+    }
+
+    .subcopy{
+      font-size:clamp(.9rem, 2.4vw, 1.05rem);
+      font-weight:500;
+      opacity:.75;
+      margin-top:.4rem;
+    }
+
+    /* Jardín donde aparecen las flores */
+    #garden{
+      position:absolute; inset:0;
+      overflow:hidden;
+    }
+
+    /* Flor base (contenedor) */
+    .flower{
+      position:absolute;
+      width: var(--size);
+      height: var(--size);
+      transform-origin:center;
+      filter: saturate(1.05) contrast(1.02);
+      animation: sway var(--animDur, 10s) ease-in-out infinite;
+      opacity:0;
+      animation-name: popIn, sway;
+      animation-duration: .7s, var(--animDur, 10s);
+      animation-delay: 0s, .1s;
+      animation-fill-mode: forwards;
+      pointer-events: none; /* para que no bloquee clics */
+    }
+
+    /* Pétalos: se colocan alrededor del centro con transform */
+    .petal{
+      position:absolute;
+      top:50%; left:50%;
+      width: calc(var(--size) * .38);
+      height: calc(var(--size) * .38);
+      transform: translate(-50%, -50%) rotate(calc(var(--i) * 45deg)) translate(0, calc(var(--size) * -.2));
+      border-radius: 52% 52% 48% 48% / 64% 64% 36% 36%; /* forma de gota suave */
+      background:
+        radial-gradient(circle at 30% 30%, #fffde7 0 20%, var(--flower-yellow) 32%, var(--flower-yellow-2) 65%, var(--flower-yellow-3) 100%);
+      box-shadow: 0 2px 6px rgba(0,0,0,.18);
+      will-change: transform;
+    }
+
+    /* Centro de la flor */
+    .core{
+      position:absolute; inset:50% auto auto 50%;
+      width: calc(var(--size) * .28);
+      height: calc(var(--size) * .28);
+      transform: translate(-50%, -50%);
+      border-radius:50%;
+      background: radial-gradient(circle at 35% 35%, var(--flower-core-1), var(--flower-core-2));
+      box-shadow:
+        0 0 0 calc(var(--size) * .015) rgba(253,216,53,.35),
+        0 2px 10px rgba(0,0,0,.25);
+    }
+
+    /* Botón liviano para sumar flores */
+    .controls{
+      position:absolute; inset: auto 1rem 1rem auto;
+      display:flex; gap:.5rem; align-items:center;
+    }
+    .btn{
+      appearance:none; border:0; border-radius:999px;
+      padding:.7rem 1rem; font-weight:700; cursor:pointer;
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+      backdrop-filter: blur(6px);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .btn:focus{ outline: 3px solid rgba(255,212,59,.6); outline-offset: 2px; }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,0,0,.18); }
+
+    /* Animaciones */
+    @keyframes sway {
+      0%,100%{ transform: translateY(0) rotate(0deg); }
+      50%{ transform: translateY(-6px) rotate(1.4deg); }
+    }
+    @keyframes popIn {
+      0%{ opacity:0; transform: scale(.6); }
+      100%{ opacity:1; transform: scale(1); }
+    }
+
+    /* Respeto por accesibilidad de movimiento */
+    @media (prefers-reduced-motion: reduce){
+      .flower{ animation: popIn .6s both; }
+    }
+
+    /* Pista de interacción en móviles */
+    .hint{
+      position:absolute; inset:auto 0 1rem 0; text-align:center;
+      font-size:.9rem; opacity:.6; user-select:none; pointer-events:none;
+    }
+  </style>
+</head>
+<body>
+  <main class="screen" id="screen" aria-label="Escena con flores amarillas" role="img">
+    <h1 class="greeting" aria-live="polite" aria-atomic="true">¡Feliz día!
+      <div class="subcopy">Tocá o hacé clic para sembrar más flores ✨</div>
+    </h1>
+
+    <div id="garden" aria-hidden="true"></div>
+
+    <div class="controls" role="group" aria-label="Acciones">
+      <button class="btn" id="addOne" type="button">Agregar flor</button>
+      <button class="btn" id="clear" type="button">Limpiar</button>
+    </div>
+
+    <div class="hint">Consejo: con cada clic nace una nueva flor 🌼</div>
+  </main>
+
+  <script>
+    // Utilidades rápidas
+    const rand = (min, max) => Math.random() * (max - min) + min;
+    const pick = (arr) => arr[(Math.random() * arr.length) | 0];
+
+    const garden = document.getElementById('garden');
+    const screenEl = document.getElementById('screen');
+
+    /** Crea una flor amarilla en (x, y) con tamaño (px). */
+    function crearFlor(x, y, size){
+      const flower = document.createElement('div');
+      flower.className = 'flower';
+      flower.style.setProperty('--size', size + 'px');
+      flower.style.setProperty('--animDur', rand(8, 16) + 's');
+      flower.style.left = x + 'px';
+      flower.style.top  = y + 'px';
+
+      // 8 pétalos simétricos (45° entre sí)
+      for(let i=0; i<8; i++){
+        const p = document.createElement('span');
+        p.className = 'petal';
+        p.style.setProperty('--i', i);
+        flower.appendChild(p);
+      }
+
+      // Centro
+      const core = document.createElement('span');
+      core.className = 'core';
+      flower.appendChild(core);
+
+      garden.appendChild(flower);
+      // Remueve exceso si hubiera demasiadas (cuida rendimiento)
+      if(garden.childElementCount > 120){
+        garden.firstElementChild?.remove();
+      }
+      return flower;
+    }
+
+    /** Genera varias flores aleatorias por la pantalla */
+    function sembrarInicial(cuantas=24){
+      const { width, height } = screenEl.getBoundingClientRect();
+      for(let i=0; i<cuantas; i++){
+        const size = rand(52, 120);
+        const x = rand(0, width);
+        const y = rand(height*.18, height*.95);
+        crearFlor(x, y, size);
+      }
+    }
+
+    // Interacciones
+    screenEl.addEventListener('pointerdown', (e) => {
+      const rect = screenEl.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const size = rand(60, 130);
+      crearFlor(x, y, size);
+    });
+
+    document.getElementById('addOne').addEventListener('click', () => {
+      const rect = screenEl.getBoundingClientRect();
+      crearFlor(rand(40, rect.width-40), rand(rect.height*.25, rect.height*.95), rand(70, 140));
+    });
+
+    document.getElementById('clear').addEventListener('click', () => {
+      garden.innerHTML = '';
+      sembrarInicial(18);
+    });
+
+    // Teclado: presioná "F" para flor rápida, "L" para limpiar
+    window.addEventListener('keydown', (e) => {
+      if(e.key.toLowerCase() === 'f'){
+        document.getElementById('addOne').click();
+      } else if(e.key.toLowerCase() === 'l'){
+        document.getElementById('clear').click();
+      }
+    });
+
+    // Si el usuario prefiere menos animación, sembramos menos
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    sembrarInicial(prefersReduced ? 12 : 26);
+  </script>
+</body>
+</html>
